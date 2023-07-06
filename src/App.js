@@ -21,14 +21,14 @@ function App() {
 
   const [infoPeople, setInfoPeople] = useState('')
 
-  console.log(typeof customTip)
+  const [selectedTip, setSelectedTip] = useState()
 
   useEffect(() => {
     if(person < 1){
       setTotal(price)
     }if(person >= 1){
       const calcTotal = (price + tipAmount) / person;
-      setTotal(calcTotal.toFixed(2))
+      setTotal(Number(calcTotal.toFixed(2)))
     }
   }, [price, person, tipAmount])
 
@@ -48,8 +48,17 @@ function App() {
 
   const getTip = (e) => {
     e.preventDefault();
-    setTip(Number(e.target.textContent))
-  }
+    const selected = Number(e.target.textContent);
+    setTip(selected);
+    setSelectedTip(selected); // Установка выбранной кнопки
+    setCustomTip(0)
+  };
+
+  const getCustomTip = (e) => {
+    const customTipValue = Number(e.target.value);
+    setCustomTip(customTipValue);
+    setTip(0)
+  };
 
   useEffect(() => {
     const calcCustomTip = price * (customTip / 100)
@@ -57,17 +66,41 @@ function App() {
   })
 
   useEffect(() => {
-    const calcperTip = customTipResult / person;
-    setCustomTipPerson(Number(calcperTip))
-  })
+    if (person === 0) {
+      setCustomTipPerson(0); // Устанавливаем значение 0, когда person равно 0
+    } else {
+      const calcperTip = customTipResult / person;
+      setCustomTipPerson(Number(calcperTip));
+    }
+  }, [person, customTipResult]);
 
   useEffect(() => {
-    if(person === 0){
+    if(person < 1){
+      const getInputPerson = document.querySelector('.person-input');
+      if(getInputPerson && getInputPerson.classList.contains('person-input')) {
+        getInputPerson.classList.remove('person-input');
+        getInputPerson.classList.add('person-input-error');
+      }
       setInfoPeople('Can`t be zero')
+      setTotal(0)
     }else{
+      const getInputPersonError = document.querySelector('.person-input-error');
+      if(getInputPersonError && getInputPersonError.classList.contains('person-input-error')) {
+        getInputPersonError.classList.remove('person-input-error');
+        getInputPersonError.classList.add('person-input');
+      }
       setInfoPeople('')
     }
   })
+
+  const reset = () => {
+    setPrice(0)
+    setPerson(1)
+    setTip(0)
+  }
+
+  console.log(customTip)
+  console.log(tip)
 
   return (
     <>
@@ -88,17 +121,31 @@ function App() {
                   step="0.01"
                 ></input>
               </div>
-          <p className='tip-text'>Select Tip %</p>
+          <p className='tip-text'>Select Tip % / Custom</p>
           <div className='tip-block'>
-            <button onClick={getTip}>5</button>
-            <button onClick={getTip}>10</button>
-            <button onClick={getTip}>15</button>
-            <button onClick={getTip}>20</button>
-            <button onClick={getTip}>25</button>
+            <button 
+              onClick={getTip}
+              className={tip === 5 ? 'active-button-tip' : 'deactiveted-btn-tip'}  
+            >5</button>
+            <button 
+              onClick={getTip}
+              className={tip === 10 ? 'active-button-tip' : 'deactiveted-btn-tip'}    
+            >10</button>
+            <button 
+              onClick={getTip}
+              className={tip === 15 ? 'active-button-tip' : 'deactiveted-btn-tip'}   
+            >15</button>
+            <button 
+              onClick={getTip}
+              className={tip === 20 ? 'active-button-tip' : 'deactiveted-btn-tip'} 
+            >20</button>
+            <button 
+              onClick={getTip}
+              className={tip === 25 ? 'active-button-tip' : 'deactiveted-btn-tip'}   
+            >25</button>
             <input
               value={customTip}
-              onChange={(e) => setCustomTip(Number(e.target.value))}
-              placeholder='custom'
+              onChange={getCustomTip}
               className='custom-tip'
             ></input>
           </div>
@@ -117,7 +164,6 @@ function App() {
                 className='person-input'
               ></input>
             </div>
-          
           </form>
           <div className='block-output-value'>
             <div className='output-value'>
@@ -135,7 +181,7 @@ function App() {
                     </div>
                   : 
                     <div className='tip-person'>
-                      <div>
+                      <div className='tip-amount-person'>
                         <p>Tip Amount</p>
                         <p>/ person</p>
                       </div>
@@ -145,27 +191,24 @@ function App() {
                     </div>
                 }
               </div>
-              
               <div className='block-total-person'>
                 <div className='total-person'>
                   <p>Total</p>
                   <p>/ person</p>
                 </div>
-                <div className='total'>${total}</div>
+                <div className='total'>${total.toFixed(2)}</div>
               </div>
-              
-              <button className='reset'>RESET</button>
+              <button 
+                className='reset'
+                onClick={reset}
+              >RESET</button>
             </div> 
           </div>
-          
         </div>
       </div>
-      
     </div>
     </>
   );
 }
 
 export default App;
-
-/**/
